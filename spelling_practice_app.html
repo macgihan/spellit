@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Practice App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .word-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #4a5568;
+            margin: 30px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .input-section {
+            margin: 30px 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feedback {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .correct {
+            color: #38a169;
+            animation: bounce 0.5s ease;
+        }
+        
+        .incorrect {
+            color: #e53e3e;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 15px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        .difficulty-selector {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .difficulty-btn {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .word-hint {
+            font-size: 1.1em;
+            color: #718096;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 2em; }
+            .word-display { font-size: 2em; }
+            input[type="text"] { font-size: 1.2em; }
+            .controls { flex-direction: column; align-items: center; }
+            button { width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Spelling Practice</h1>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="correct-count">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="total-count">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="accuracy">0%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+        </div>
+        
+        <div class="word-display" id="word-display">
+            Click "New Word" to start!
+        </div>
+        
+        <div class="word-hint" id="word-hint"></div>
+        
+        <div class="controls">
+            <button onclick="newWord()" id="new-word-btn">🔄 New Word</button>
+            <button onclick="speakWord()" id="speak-btn">🔊 Hear Word</button>
+            <button onclick="showHint()" id="hint-btn">💡 Show Hint</button>
+        </div>
+        
+        <div class="input-section">
+            <input type="text" id="spelling-input" placeholder="Type the spelling here..." 
+                   onkeypress="handleKeyPress(event)" autocomplete="off">
+            <br>
+            <button onclick="checkSpelling()" id="check-btn">✓ Check Spelling</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        // Word lists by difficulty - PTE Academic focused
+        const wordLists = {
+            easy: [
+                { word: 'study', hint: 'To learn or examine carefully' },
+                { word: 'learn', hint: 'To gain knowledge or skill' },
+                { word: 'teach', hint: 'To give instruction to students' },
+                { word: 'school', hint: 'Place where students learn' },
+                { word: 'write', hint: 'To form letters and words' },
+                { word: 'speak', hint: 'To talk or communicate verbally' },
+                { word: 'listen', hint: 'To pay attention to sounds' },
+                { word: 'method', hint: 'A way of doing something' },
+                { word: 'simple', hint: 'Easy to understand' },
+                { word: 'change', hint: 'To make or become different' },
+                { word: 'group', hint: 'A number of people together' },
+                { word: 'point', hint: 'A specific detail or location' },
+                { word: 'right', hint: 'Correct or proper' },
+                { word: 'place', hint: 'A particular location' },
+                { word: 'given', hint: 'Provided or presented' },
+                { word: 'human', hint: 'Relating to people' },
+                { word: 'large', hint: 'Big in size' },
+                { word: 'small', hint: 'Little in size' },
+                { word: 'local', hint: 'From a nearby area' },
+                { word: 'major', hint: 'Important or significant' },
+                { word: 'social', hint: 'Related to society' },
+                { word: 'public', hint: 'Open to everyone' },
+                { word: 'common', hint: 'Ordinary or usual' },
+                { word: 'whole', hint: 'Complete or entire' },
+                { word: 'clear', hint: 'Easy to see or understand' },
+                { word: 'level', hint: 'A degree or standard' },
+                { word: 'issue', hint: 'A problem or topic' },
+                { word: 'focus', hint: 'To concentrate attention' },
+                { word: 'result', hint: 'The outcome of something' },
+                { word: 'access', hint: 'The ability to enter or use' }
+            ],
+            medium: [
+                { word: 'analysis', hint: 'Detailed examination of something' },
+                { word: 'research', hint: 'Systematic investigation' },
+                { word: 'evidence', hint: 'Facts that support a conclusion' },
+                { word: 'argument', hint: 'A reason given to support an idea' },
+                { word: 'culture', hint: 'The customs and beliefs of a group' },
+                { word: 'society', hint: 'A community of people' },
+                { word: 'economic', hint: 'Related to money and trade' },
+                { word: 'process', hint: 'A series of actions' },
+                { word: 'concept', hint: 'An abstract idea' },
+                { word: 'theory', hint: 'A system of ideas explaining something' },
+                { word: 'develop', hint: 'To grow or create gradually' },
+                { word: 'include', hint: 'To contain as part of a whole' },
+                { word: 'require', hint: 'To need something' },
+                { word: 'provide', hint: 'To give or supply' },
+                { word: 'consider', hint: 'To think about carefully' },
+                { word: 'suggest', hint: 'To propose or recommend' },
+                { word: 'explain', hint: 'To make clear or understandable' },
+                { word: 'describe', hint: 'To give details about something' },
+                { word: 'compare', hint: 'To examine similarities and differences' },
+                { word: 'measure', hint: 'To determine size or amount' },
+                { word: 'specific', hint: 'Clearly defined or particular' },
+                { word: 'general', hint: 'Not specific, broadly applicable' },
+                { word: 'control', hint: 'To direct or manage' },
+                { word: 'standard', hint: 'A level of quality or achievement' },
+                { word: 'contain', hint: 'To hold or include within' },
+                { word: 'reduce', hint: 'To make smaller or less' },
+                { word: 'increase', hint: 'To make larger or more' },
+                { word: 'design', hint: 'To plan and create' },
+                { word: 'present', hint: 'To show or display' },
+                { word: 'achieve', hint: 'To successfully complete' },
+                { word: 'element', hint: 'A basic part or component' },
+                { word: 'feature', hint: 'A distinctive characteristic' },
+                { word: 'create', hint: 'To make or produce' },
+                { word: 'remove', hint: 'To take away' },
+                { word: 'structure', hint: 'The arrangement of parts' },
+                { word: 'system', hint: 'An organized set of procedures' },
+                { word: 'purpose', hint: 'The reason for which something exists' },
+                { word: 'source', hint: 'The origin of something' },
+                { word: 'nature', hint: 'The basic character of something' },
+                { word: 'benefit', hint: 'An advantage or positive effect' }
+            ],
+            hard: [
+                { word: 'academic', hint: 'Related to education or scholarship' },
+                { word: 'appropriate', hint: 'Suitable or proper for a situation' },
+                { word: 'significant', hint: 'Important or meaningful' },
+                { word: 'environment', hint: 'The surroundings or conditions' },
+                { word: 'individual', hint: 'A single person or thing' },
+                { word: 'particularly', hint: 'Especially or specifically' },
+                { word: 'available', hint: 'Ready for use or accessible' },
+                { word: 'important', hint: 'Of great value or significance' },
+                { word: 'necessary', hint: 'Required or essential' },
+                { word: 'establish', hint: 'To set up or create' },
+                { word: 'determine', hint: 'To decide or establish exactly' },
+                { word: 'influence', hint: 'To affect or modify' },
+                { word: 'identify', hint: 'To recognize or establish' },
+                { word: 'approach', hint: 'A way of dealing with something' },
+                { word: 'maintain', hint: 'To keep in good condition' },
+                { word: 'adequate', hint: 'Sufficient or satisfactory' },
+                { word: 'relevant', hint: 'Closely connected to the matter' },
+                { word: 'consistent', hint: 'Acting in the same way over time' },
+                { word: 'alternative', hint: 'A different option or choice' },
+                { word: 'consequence', hint: 'A result or effect' },
+                { word: 'fundamental', hint: 'Basic or essential' },
+                { word: 'traditional', hint: 'Based on long-established customs' },
+                { word: 'communicate', hint: 'To share information or ideas' },
+                { word: 'contribute', hint: 'To give or add to something' },
+                { word: 'demonstrate', hint: 'To show or prove clearly' },
+                { word: 'participate', hint: 'To take part in something' },
+                { word: 'responsible', hint: 'Accountable for something' },
+                { word: 'technology', hint: 'The application of scientific knowledge' },
+                { word: 'investigate', hint: 'To examine systematically' },
+                { word: 'opportunity', hint: 'A chance for advancement' },
+                { word: 'commitment', hint: 'A pledge or dedication' },
+                { word: 'achievement', hint: 'Something accomplished successfully' },
+                { word: 'capability', hint: 'The ability to do something' },
+                { word: 'flexibility', hint: 'The ability to adapt to change' },
+                { word: 'innovation', hint: 'A new method or idea' },
+                { word: 'collaboration', hint: 'Working together with others' },
+                { word: 'integration', hint: 'The process of combining parts' },
+                { word: 'interpretation', hint: 'The explanation of meaning' },
+                { word: 'implementation', hint: 'The process of putting into effect' },
+                { word: 'recommendation', hint: 'A suggestion or advice' },
+                { word: 'characteristic', hint: 'A typical feature or quality' },
+                { word: 'contemporary', hint: 'Existing at the same time' },
+                { word: 'significance', hint: 'The importance or meaning' },
+                { word: 'assessment', hint: 'The evaluation of something' },
+                { word: 'evaluation', hint: 'The process of judging value' },
+                { word: 'perspective', hint: 'A particular point of view' },
+                { word: 'methodology', hint: 'A system of methods' },
+                { word: 'substantial', hint: 'Considerable in size or amount' },
+                { word: 'comprehensive', hint: 'Complete and thorough' },
+                { word: 'sophisticated', hint: 'Complex and advanced' },
+                { word: 'theoretical', hint: 'Based on theory rather than practice' }
+            ]
+        };
+
+        let currentDifficulty = 'easy';
+        let currentWord = null;
+        let correctCount = 0;
+        let totalCount = 0;
+        let hintShown = false;
+
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            
+            // Update button states
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reset current word
+            currentWord = null;
+            document.getElementById('word-display').textContent = 'Click "New Word" to start!';
+            document.getElementById('word-hint').textContent = '';
+            document.getElementById('spelling-input').value = '';
+            document.getElementById('feedback').textContent = '';
+            hintShown = false;
+        }
+
+        function newWord() {
+            const wordList = wordLists[currentDifficulty];
+            const randomIndex = Math.floor(Math.random() * wordList.length);
+            currentWord = wordList[randomIndex];
+            
+            document.getElementById('word-display').textContent = '🔊 Listen and type!';
+            document.getElementById('word-hint').textContent = '';
+            document.getElementById('spelling-input').value = '';
+            document.getElementById('feedback').textContent = '';
+            hintShown = false;
+            
+            // Speak the word immediately
+            setTimeout(() => speakWord(), 500);
+        }
+
+        function speakWord() {
+            if (!currentWord) {
+                alert('Please click "New Word" first!');
+                return;
+            }
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(currentWord.word);
+                utterance.rate = 0.8;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Speech synthesis not supported in your browser');
+            }
+        }
+
+        function showHint() {
+            if (!currentWord) {
+                alert('Please click "New Word" first!');
+                return;
+            }
+            
+            document.getElementById('word-hint').textContent = `💡 Hint: ${currentWord.hint}`;
+            hintShown = true;
+        }
+
+        function checkSpelling() {
+            if (!currentWord) {
+                alert('Please click "New Word" first!');
+                return;
+            }
+            
+            const input = document.getElementById('spelling-input').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback');
+            
+            if (!input) {
+                feedback.innerHTML = '⚠️ Please enter a spelling first!';
+                feedback.className = 'feedback incorrect';
+                return;
+            }
+            
+            totalCount++;
+            
+            if (input === currentWord.word.toLowerCase()) {
+                correctCount++;
+                feedback.innerHTML = `🎉 Correct! The word is "${currentWord.word}"`;
+                feedback.className = 'feedback correct';
+                
+                // Auto-advance to next word after 2 seconds
+                setTimeout(() => {
+                    newWord();
+                }, 2000);
+            } else {
+                feedback.innerHTML = `❌ Incorrect. The correct spelling is "${currentWord.word}"`;
+                feedback.className = 'feedback incorrect';
+            }
+            
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('total-count').textContent = totalCount;
+            const accuracy = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkSpelling();
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('spelling-input').focus();
+        });
+    </script>
+</body>
+</html>
